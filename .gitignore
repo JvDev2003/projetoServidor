@@ -1,7 +1,7 @@
 # Backend
 backend/node_modules
 backend/.env
-backend/log
+backend/logs
 
 #frontend
 frontend/node_modules
