@@ -5,7 +5,7 @@ const apiUrl = import.meta.env.VITE_URL;
 import { useAuth } from "./useAuth";
 import { jwtDecode } from "jwt-decode";
 
-const useLogin = () => {
+const useSession = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cancelled, setCancelled] = useState(false);
@@ -17,22 +17,21 @@ const useLogin = () => {
     }
   }
 
-  const login = async (email: string, senha: string) => {
+  const verifySession = async () => {
     checkIfIsCancelled();
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${apiUrl}/login`, { email, senha });
-      const { token } = response.data;
-      sessionStorage.setItem("token", token);
-      const { admin } = jwtDecode(token) as jwtPayloadI;
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+      const { admin, email } = jwtDecode(token) as jwtPayloadI;
 
       setIsAuthenticated(true);
       setAdmin(admin);
       setEmail(email);
-
-      return response;
     } catch (error: any) {
       setError(error.response?.data?.msg || error.message);
       console.log(`Error: ${error.response?.data?.msg || error.message}`);
@@ -46,7 +45,7 @@ const useLogin = () => {
     return () => setCancelled(true);
   }, []);
 
-  return { login, loading, error };
+  return { verifySession, loading, error };
 };
 
-export default useLogin;
+export default useSession;

@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
-import { jwtPayloadI } from "../interfaces/JwtPayload.interface";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_URL;
-import { useAuth } from "./useAuth";
-import { jwtDecode } from "jwt-decode";
 
-const useLogin = () => {
+const useEditUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cancelled, setCancelled] = useState(false);
-  const { setIsAuthenticated, setAdmin, setEmail } = useAuth();
 
   function checkIfIsCancelled() {
     if (cancelled) {
@@ -17,20 +14,23 @@ const useLogin = () => {
     }
   }
 
-  const login = async (email: string, senha: string) => {
+  const editUser = async (email: string, senha: string, nome: string) => {
     checkIfIsCancelled();
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${apiUrl}/login`, { email, senha });
-      const { token } = response.data;
-      sessionStorage.setItem("token", token);
-      const { admin } = jwtDecode(token) as jwtPayloadI;
+      const token = sessionStorage.getItem("token");
 
-      setIsAuthenticated(true);
-      setAdmin(admin);
-      setEmail(email);
+      const response = await axios.put(
+        `${apiUrl}/usuarios/${email}`,
+        { nome, senha },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       return response;
     } catch (error: any) {
@@ -46,7 +46,7 @@ const useLogin = () => {
     return () => setCancelled(true);
   }, []);
 
-  return { login, loading, error };
+  return { editUser, loading, error };
 };
 
-export default useLogin;
+export default useEditUser;

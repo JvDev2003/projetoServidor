@@ -35,7 +35,7 @@ export async function createUser(req: Request, res: Response) {
 
 export async function getUsers(req: Request, res: Response) {
   try {
-    const users = await UsuarioSchema.findOne({});
+    const users = await UsuarioSchema.find({});
 
     return res.status(201).json(users);
   } catch (e: any) {
@@ -49,13 +49,15 @@ export async function getUser(req: Request, res: Response) {
     const { email } = req.params;
     const { jwt } = req.body;
 
-    if (!jwt.admin || jwt.email !== email) {
-      return res.status(401).json({ mensagem: "Você não tem permissão!" });
+    if (!jwt.admin) {
+      if (jwt.email !== email) {
+        return res.status(401).json({ mensagem: "Você não tem permissão!" });
+      }
     }
 
     const user = await UsuarioSchema.findOne({ email: email });
 
-    if (user) {
+    if (!user) {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
@@ -71,8 +73,10 @@ export async function editUser(req: Request, res: Response) {
     const { email } = req.params;
     const { nome, senha, jwt } = req.body;
 
-    if (!jwt.admin || jwt.email !== email) {
-      return res.status(401).json({ mensagem: "Você não tem permissão!" });
+    if (!jwt.admin) {
+      if (jwt.email !== email) {
+        return res.status(401).json({ mensagem: "Você não tem permissão!" });
+      }
     }
 
     const user = await UsuarioSchema.findOne({ email: email });
@@ -81,7 +85,7 @@ export async function editUser(req: Request, res: Response) {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    const hash = hashPassword(senha);
+    const hash = await hashPassword(senha);
 
     await UsuarioSchema.updateOne(
       { email: email },
@@ -105,8 +109,10 @@ export async function deleteUser(req: Request, res: Response) {
     const { email } = req.params;
     const { jwt } = req.body;
 
-    if (!jwt.admin || jwt.email !== email) {
-      return res.status(401).json({ mensagem: "Você não tem permissão!" });
+    if (!jwt.admin) {
+      if (jwt.email !== email) {
+        return res.status(401).json({ mensagem: "Você não tem permissão!" });
+      }
     }
 
     const user = await UsuarioSchema.findOne({ email: email });

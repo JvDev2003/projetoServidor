@@ -1,18 +1,42 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useRegister from '../hooks/useRegister';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
-import Menu from '../components/Menu';
+import { UserI } from '../interfaces/User.interface';
+import useEditUser from '../hooks/useEditUser';
+import useUser from '../hooks/useUser';
 
-const Register = () => {
+const EditUser = () => {
+  const { email } = useParams<{ email: string }>();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const {register, loading, error} = useRegister()
-  const navigate = useNavigate()
+  const { findUser, loading, error } = useUser();
+  const [usuario, setUsuario] = useState<UserI | null>(null);
+  const { editUser, loading: loadingEdit, error: errorEdit } = useEditUser();
+  const navigate = useNavigate();
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const fetchData = async () => {
+    try {
+      const result = await findUser(email!);
+      if (result) {
+        setUsuario(result);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (usuario) {
+      setName(usuario.nome);
+    }
+  }, [usuario]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert("As senhas não coincidem!");
@@ -20,22 +44,17 @@ const Register = () => {
     }
 
     try {
-        await register(email, password, name)
-        navigate("/login")
+      await editUser(email!, password, name);
+      navigate(-1);
     } catch (error) {
-        console.error(error)
+      console.error(error);
     }
   };
 
-  const handleLogin = () => {
-    navigate("/login")
-  }
-
   return (
-    <>
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-12">
       <div className="w-full max-w-md p-8 space-y-8 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center">Cadastro</h2>
+        <h2 className="text-2xl font-bold text-center">Editar Usuário</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm">
             <div>
@@ -50,20 +69,6 @@ const Register = () => {
                 placeholder="Nome"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -95,88 +100,49 @@ const Register = () => {
             </div>
           </div>
           <div>
-            {loading ? (
-            <button
+            {loadingEdit ? (
+              <button
                 type="submit"
                 disabled
                 className="group relative flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
+              >
                 <svg
-                className="w-5 h-5 mr-3 text-white animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+                  className="w-5 h-5 mr-3 text-white animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
                 >
-                <circle
+                  <circle
                     className="opacity-25"
                     cx="12"
                     cy="12"
                     r="10"
                     stroke="currentColor"
                     strokeWidth="4"
-                ></circle>
-                <path
+                  ></circle>
+                  <path
                     className="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
+                  ></path>
                 </svg>
                 Carregando...
-            </button>
-            ):(
-                <button
+              </button>
+            ) : (
+              <button
                 type="submit"
                 className="group relative flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                Cadastrar
-                </button>
-            )}
-          </div>
-          <div>
-            {loading ? (            
-            <button
-                type="submit"
-                disabled
-                className="group relative flex justify-center w-full px-4 py-2 text-sm font-medium text-black bg-gray-200 border border-transparent rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                <svg
-                className="w-5 h-5 mr-3 text-white animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                >
-                <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                ></circle>
-                <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
-                </svg>
-                Carregando...
-            </button>
-            ): (
-            <button
-              type="button"
-              onClick={handleLogin}
-              className="group relative flex justify-center w-full px-4 py-2 text-sm font-medium text-black bg-gray-200 border border-transparent rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Já possui cadastro?
-            </button>
+              >
+                Editar
+              </button>
             )}
           </div>
         </form>
+        {errorEdit && <ErrorMessage message={errorEdit} />}
         {error && <ErrorMessage message={error} />}
       </div>
     </div>
-    </>
   );
 };
 
-export default Register;
+export default EditUser;

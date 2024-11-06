@@ -1,6 +1,11 @@
+import Menu from "../components/Menu"
+
 const Teste = () => {
   return (
-    <div>Teste</div>
+    
+    <div>
+    <p>Teste</p>
+    </div>
   )
 }
 

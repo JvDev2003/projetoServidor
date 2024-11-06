@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useLogin from '../hooks/useLogin';
 import ErrorMessage from '../components/ErrorMessage';
+import Menu from '../components/Menu';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ const Login = () => {
     
     try {
         await login(email, password);
-        navigate("/teste")
+        navigate("/")
     } catch (error) {
         console.error(error)
     } 
@@ -25,7 +26,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+  <>
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-12">
       <div className="w-full max-w-md p-8 space-y-8 bg-white shadow-lg rounded-lg">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -140,6 +142,7 @@ const Login = () => {
         {error && <ErrorMessage message={error} />}
       </div>
     </div>
+  </>
   );
 };
 
