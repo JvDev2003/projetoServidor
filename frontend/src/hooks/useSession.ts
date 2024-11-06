@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { jwtPayloadI } from "../interfaces/JwtPayload.interface";
-import axios from "axios";
-const apiUrl = import.meta.env.VITE_URL;
 import { useAuth } from "./useAuth";
 import { jwtDecode } from "jwt-decode";
 

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Usuarios = () => {
   const { users, loading, error } = useUsers();
   const [usuarios, setUsuarios] = useState<UserI[]>([]);
-  const {deleteUser, loading: loadingDelete, error: erroDelete} = useDeleteUser()
+  const {deleteUser} = useDeleteUser()
   const navigate = useNavigate()
 
   const fetchData = async () => {

@@ -80,7 +80,7 @@ const EditUser = () => {
                 autoComplete="current-password"
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Senha"
+                placeholder="Nova senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -93,7 +93,7 @@ const EditUser = () => {
                 type="password"
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Confirmar Senha"
+                placeholder="Confirmar Nova Senha"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
