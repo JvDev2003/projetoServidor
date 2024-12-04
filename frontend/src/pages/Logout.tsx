@@ -1,22 +1,23 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import useLogin from "../hooks/useLogin";
 
 const Logout = () => {
-    const {setAdmin, setIsAuthenticated} = useAuth()
+    const { logout, error, loading } = useLogin()
     const navigate = useNavigate();
     useEffect(() => {
-        sessionStorage.removeItem('token');
-        setAdmin(false)
-        setIsAuthenticated(false)
-        navigate('/')
-        return () => {
-            
-        };
-    },[]);
+        const out = async () => {
+            await logout()
+            navigate("/")
+        }
+
+        out()
+    }, []);
 
     return (
         <div>
+            {error && <p>{error}</p>}
+            {loading && <p>carregando</p>}
             <p>Você está sendo desconectado...</p>
         </div>
     )

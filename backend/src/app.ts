@@ -21,6 +21,6 @@ app.use("/", router);
 const port = config.get<string>("port");
 
 app.listen(port, async () => {
-    await db();
-    Logger.info(`O servidor está na porta ${port}`);
+  await db();
+  Logger.info(`O servidor está na porta ${port}`);
 });

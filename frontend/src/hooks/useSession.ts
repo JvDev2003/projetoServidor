@@ -27,6 +27,8 @@ const useSession = () => {
       }
       const { admin, email } = jwtDecode(token) as jwtPayloadI;
 
+      console.log({ admin, email });
+
       setIsAuthenticated(true);
       setAdmin(admin);
       setEmail(email);

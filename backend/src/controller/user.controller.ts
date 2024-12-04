@@ -11,8 +11,6 @@ export async function createUser(req: Request, res: Response) {
 
     const user = await UsuarioSchema.findOne({ email: email });
 
-    Logger.info(user);
-
     if (user) {
       return res.status(409).json({ mensagem: "Email já cadastrado" });
     }
@@ -26,6 +24,8 @@ export async function createUser(req: Request, res: Response) {
       permissao: "user",
     });
 
+    Logger.info("Usuario criado com sucesso");
+
     return res.status(201).json({});
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
@@ -36,6 +36,18 @@ export async function createUser(req: Request, res: Response) {
 export async function getUsers(req: Request, res: Response) {
   try {
     const users = await UsuarioSchema.find({});
+
+    Logger.info("Todos os usuarios recebidos com sucesso");
+
+    const simpleUsers = users.map((user) => {
+      const { email, nome } = user;
+
+      return {
+        nome,
+        email,
+        senha: "",
+      };
+    });
 
     return res.status(201).json(users);
   } catch (e: any) {
@@ -60,6 +72,8 @@ export async function getUser(req: Request, res: Response) {
     if (!user) {
       return res.status(404).json({ mensagem: "Usuário não encontrado" });
     }
+
+    Logger.info("Usuario obtido com sucesso");
 
     return res.status(201).json(user);
   } catch (e: any) {
@@ -97,6 +111,8 @@ export async function editUser(req: Request, res: Response) {
       }
     );
 
+    Logger.info("Usuario editado com sucesso");
+
     return res.status(200).json({ nome, email, senha: hash });
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
@@ -122,6 +138,8 @@ export async function deleteUser(req: Request, res: Response) {
     }
 
     await user.deleteOne();
+
+    Logger.info("Usuario deletado com sucesso");
 
     return res.status(200).json({});
   } catch (e: any) {
@@ -155,6 +173,8 @@ export async function login(req: Request, res: Response) {
       { expiresIn: "15m" }
     );
 
+    Logger.info("Usuario logado com sucesso");
+
     return res.status(200).json({ token });
   } catch (e: any) {
     Logger.error(`Erro que ocorreu: ${e}`);
@@ -163,3 +183,11 @@ export async function login(req: Request, res: Response) {
       .json({ mensagem: "Ocorreu um erro, tente mais tarde!" });
   }
 }
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    return res.status(201).json({})
+  } catch (error) {
+    return res.status(401).json({});
+  }
+};

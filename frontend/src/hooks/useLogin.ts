@@ -42,11 +42,33 @@ const useLogin = () => {
     }
   };
 
+  const logout = async () => {
+    checkIfIsCancelled();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(`${apiUrl}/logout`);
+
+      sessionStorage.removeItem("token");
+      setAdmin(false);
+      setIsAuthenticated(false);
+
+      return response;
+    } catch (error: any) {
+      setError(error.response?.data?.msg || error.message);
+      console.log(`Error: ${error.response?.data?.msg || error.message}`);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     return () => setCancelled(true);
   }, []);
 
-  return { login, loading, error };
+  return { login, logout, loading, error };
 };
 
 export default useLogin;
