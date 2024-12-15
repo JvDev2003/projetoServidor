@@ -48,11 +48,10 @@ const useLogin = () => {
     setError(null);
 
     try {
-      const response = await axios.post(`${apiUrl}/logout`);
-
       sessionStorage.removeItem("token");
       setAdmin(false);
       setIsAuthenticated(false);
+      const response = await axios.post(`${apiUrl}/logout`);
 
       return response;
     } catch (error: any) {

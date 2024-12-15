@@ -15,12 +15,12 @@ export async function createUser(req: Request, res: Response) {
       return res.status(409).json({ mensagem: "Email já cadastrado" });
     }
 
-    const hash = await hashPassword(senha);
+    //const hash = await hashPassword(senha);
 
     await UsuarioSchema.create({
       nome,
       email,
-      senha: hash,
+      senha: senha,
       permissao: "user",
     });
 
@@ -40,16 +40,16 @@ export async function getUsers(req: Request, res: Response) {
     Logger.info("Todos os usuarios recebidos com sucesso");
 
     const simpleUsers = users.map((user) => {
-      const { email, nome } = user;
+      const { email, nome, senha } = user;
 
       return {
         nome,
         email,
-        senha: "",
+        senha,
       };
     });
 
-    return res.status(201).json(users);
+    return res.status(201).json(simpleUsers);
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
     return res.status(500).json({ mensagem: "Tente Novamente mais tarde!" });
@@ -75,7 +75,13 @@ export async function getUser(req: Request, res: Response) {
 
     Logger.info("Usuario obtido com sucesso");
 
-    return res.status(201).json(user);
+    //return res.status(201).json(user);
+
+    return res.status(201).json({
+      nome: user.nome,
+      email: user.email,
+      senha: "",
+    });
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
     return res.status(500).json({ mensagem: "Tente Novamente mais tarde!" });
@@ -158,10 +164,13 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
     }
 
-    if (!(await comparePassword(senha, user.senha))) {
+    // if (!(await comparePassword(senha, user.senha))) {
+    //   return res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
+    // }
+
+    if (senha !== user.senha) {
       return res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
     }
-
     const jwtSecret = config.get<string>("jwtSecret");
 
     const token = jwt.sign(
@@ -186,7 +195,7 @@ export async function login(req: Request, res: Response) {
 
 export const logout = async (req: Request, res: Response) => {
   try {
-    return res.status(201).json({})
+    return res.status(201).json({});
   } catch (error) {
     return res.status(401).json({});
   }
