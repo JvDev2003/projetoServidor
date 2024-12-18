@@ -48,10 +48,19 @@ const useLogin = () => {
     setError(null);
 
     try {
+      const token = sessionStorage.getItem("token");
       sessionStorage.removeItem("token");
       setAdmin(false);
       setIsAuthenticated(false);
-      const response = await axios.post(`${apiUrl}/logout`);
+      const response = await axios.post(
+        `${apiUrl}/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       return response;
     } catch (error: any) {
