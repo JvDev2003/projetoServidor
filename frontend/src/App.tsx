@@ -20,12 +20,15 @@ import Categorias from './pages/Categorias';
 import CreateCategorias from './pages/CreateCategorias';
 import EditCategorias from './pages/EditCategorias';
 import CategoriasAlertas from './pages/CategoriasAlertas';
+import CreateAviso from './pages/CreateAviso';
 
 //components
 import Menu from './components/Menu'
 import MenuAdmin from './components/MenuAdmin';
 import MenuUser from './components/MenuUser';
 import Usuarios from './pages/Usuarios';
+import Avisos from './pages/Avisos';
+import AvisoUser from './pages/AvisosUser';
 
 
 function App() {
@@ -48,6 +51,8 @@ function App() {
         <Route path='/editUser/:email' element={!isAuthenticated ? <Home /> : <EditUser />} />
         <Route path='/perfil/:email' element={!isAuthenticated ? <Home /> : <Perfil />} />
         <Route path='/categorias' element={!isAuthenticated ? <Home /> : admin ? <Categorias /> : <CategoriasAlertas />} />
+        <Route path='/avisos/create/:idCategoria' element={!isAuthenticated ? <Home /> : admin ? <CreateAviso /> : <Home />} />
+        <Route path='/avisos/:idCategoria' element={!isAuthenticated ? <Home /> : admin ? <Avisos /> : <AvisoUser />} />
         <Route path='/cadastrar' element={<Register />} />
         <Route path='/login' element={<Login />} />
         <Route path='/logout' element={<Logout />} />

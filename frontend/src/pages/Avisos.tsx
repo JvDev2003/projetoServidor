@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import useCategorias from "../hooks/useCategorias";
-import { ICategorias } from "../interfaces/Categoria.interface";
-import { useNavigate } from "react-router-dom";
+import useAvisos from "../hooks/useAvisos";
+import { useNavigate, useParams } from "react-router-dom";
 import ErrorMessage from "../components/ErrorMessage";
+import IAvisos from "../interfaces/Avisos.interface";
 
-const Categorias = () => {
-    const { findAllCategorias, deleteCategoria, editCategoria, loading, error } = useCategorias();
-    const [categorias, setCategorias] = useState<ICategorias[]>([]);
+const Avisos = () => {
+    const { idCategoria } = useParams()
+    const { findAvisos, deleteAviso, editAviso, loading, error } = useAvisos();
+    const [avisos, setAvisos] = useState<IAvisos[]>([]);
     const [idCat, setIdCat] = useState('')
-    const [nome, setNome] = useState('')
+    const [descricao, setDescricao] = useState('')
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -17,19 +18,20 @@ const Categorias = () => {
 
     const fetchData = async () => {
         try {
-            const result = await findAllCategorias();
+            if (!idCategoria) {
+                throw new Error("A categoria está vazia")
+            }
+            const result = await findAvisos(idCategoria);
             if (result) {
-                setCategorias(result);
+                setAvisos(result);
             }
         } catch (error) {
             console.error('Erro ao buscar categorias:', error);
         }
     };
 
-
     const handleEdit = (id: string) => {
         setIdCat(id)
-        console.log(id)
     }
 
     const handleCancelClick = () => {
@@ -38,28 +40,28 @@ const Categorias = () => {
 
     const handleSaveEdit = async (id: string) => {
         try {
-            await editCategoria(id, nome)
+            await editAviso(id, descricao)
             setIdCat('')
-            setNome('')
+            setDescricao('')
 
-            const editCategorias: ICategorias[] = categorias.map((categoria) => {
-                if (categoria.id === idCat) {
-                    return { id: idCat, nome }
+            const editAvisos: IAvisos[] = avisos.map((aviso) => {
+                if (aviso.id === idCat) {
+                    return { id: idCat, descricao }
                 }
 
-                return categoria
+                return aviso
             })
 
-            setCategorias(editCategorias)
+            setAvisos(editAvisos)
         } catch (e) {
             console.error(e)
-            setNome('')
+            setDescricao('')
         }
     }
 
     const handleCreate = () => {
         try {
-            navigate("/criarCategoria")
+            navigate(`/avisos/create/${idCategoria}`)
         } catch (e: any) {
             console.error(e)
         }
@@ -67,46 +69,43 @@ const Categorias = () => {
 
     const handleDelete = async (id: string) => {
         try {
-            await deleteCategoria(id)
-            const catAtualizada = categorias.filter((categoria) => {
-                return categoria.id === id ? false : true
+            await deleteAviso(id)
+            const avisosAtualizada = avisos.filter((aviso) => {
+                return aviso.id === id ? false : true
             })
-            setCategorias(catAtualizada)
+            setAvisos(avisosAtualizada)
 
         } catch (e) {
             console.error(e)
         }
     }
 
-    const handleAvisos = (idCategoria: string) => {
-        navigate(`/avisos/${idCategoria}`)
-    }
 
     return (
         <>
             <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
                 <div className="w-full max-w-lg p-8 space-y-8 bg-white shadow-lg rounded-lg">
-                    <h2 className="text-2xl font-bold text-center">Lista de Categorias</h2>
+                    <h2 className="text-2xl font-bold text-center">Lista de Avisos</h2>
                     <button
                         onClick={handleCreate}
                         className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
-                        Criar Categoria
+                        Criar Aviso
                     </button>
                     {loading && <p>Carregando...</p>}
                     {error && <ErrorMessage message={error} />}
                     <ul className="space-y-4">
-                        {categorias && categorias.length === 0 && (<h4 className="text-center">Não existe nenhuma categoria categorias!</h4>)}
-                        {categorias ? categorias.map(categoria => (
-                            <li key={categoria.id} className="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-50 transition flex justify-between items-center" onClick={() => handleAvisos(categoria.id)}>
-                                {idCat === categoria.id ?
+                        {avisos && avisos.length === 0 && (<h4 className="text-center">Não existe nenhum aviso nesta categoria!</h4>)}
+                        {avisos ? avisos.map(aviso => (
+                            <li key={aviso.id} className="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-50 transition flex justify-between items-center">
+                                {idCat === aviso.id ?
                                     (
                                         <>
                                             <div className="mt-2 space-x-2">
                                                 <input
                                                     type="text"
-                                                    value={nome}
-                                                    onChange={(e) => setNome(e.target.value)}
+                                                    value={descricao}
+                                                    onChange={(e) => setDescricao(e.target.value)}
                                                     className="border-2 border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2"
                                                     autoFocus
                                                 />
@@ -114,7 +113,7 @@ const Categorias = () => {
                                             <div className="mt-2 flex space-x-2">
                                                 <button
                                                     className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                                    onClick={() => handleSaveEdit(categoria.id)}>
+                                                    onClick={() => handleSaveEdit(aviso.id)}>
                                                     Salvar
                                                 </button>
                                                 <button
@@ -129,17 +128,17 @@ const Categorias = () => {
                                     : (
                                         <>
                                             <div className="mt-2 space-x-2">
-                                                <h3>{categoria.nome}</h3>
+                                                <h3>{aviso.descricao}</h3>
                                             </div>
                                             <div className="mt-2 flex space-x-2">
                                                 <button
-                                                    onClick={() => handleEdit(categoria.id)}
+                                                    onClick={() => handleEdit(aviso.id)}
                                                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                                 >
                                                     Editar
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(categoria.id)}
+                                                    onClick={() => handleDelete(aviso.id)}
                                                     className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                                 >
                                                     Excluir
@@ -160,4 +159,4 @@ const Categorias = () => {
     );
 };
 
-export default Categorias;
+export default Avisos;

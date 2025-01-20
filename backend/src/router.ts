@@ -24,6 +24,13 @@ import {
 } from "./controller/categoria.controller";
 import { categoriaValidation } from "./middleware/categoria.validation";
 import { sessionValidation } from "./middleware/session.validation";
+import {
+  createAviso,
+  deleteAviso,
+  getAvisos,
+  updateAviso,
+} from "./controller/aviso.controller";
+import { avisosValidation } from "./middleware/avisos.validate";
 
 const router = Router();
 
@@ -69,6 +76,24 @@ export default router
     updateCategoria
   )
   .delete("/categorias/:id", sessionValidation(true), validate, deleteCategoria)
+
+  //avisos
+  .post(
+    "/avisos/",
+    sessionValidation(true),
+    avisosValidation(),
+    validate,
+    createAviso
+  )
+  .get("/avisos/:idCategoria", sessionValidation(), validate, getAvisos)
+  .put(
+    "/avisos/:id",
+    sessionValidation(true),
+    avisosValidation(),
+    validate,
+    updateAviso
+  )
+  .delete("/avisos/:id", sessionValidation(true), validate, deleteAviso)
 
   // login e logout
   .post("/login", loginValidation(), validate, login)

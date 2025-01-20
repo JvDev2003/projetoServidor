@@ -35,9 +35,7 @@ export async function createUser(req: Request, res: Response) {
 
 export async function getUsers(req: Request, res: Response) {
   try {
-    const users = await UsuarioSchema.find({});
-
-    Logger.info("Todos os usuarios recebidos com sucesso");
+    const users = await UsuarioSchema.find({ permissao: { $ne: "admin" } });
 
     const simpleUsers = users.map((user) => {
       const { email, nome, senha } = user;

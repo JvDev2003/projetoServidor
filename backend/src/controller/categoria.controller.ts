@@ -6,7 +6,10 @@ export const createCategoria = async (req: Request, res: Response) => {
   try {
     const { nome } = req.body;
 
-    await CategoriaSchema.create({ nome });
+    const dados = await CategoriaSchema.find({});
+    const index = dados.length + 1;
+
+    await CategoriaSchema.create({ nome, id: index });
 
     return res.status(201).json({});
   } catch (e: any) {
@@ -21,8 +24,8 @@ export const getCategorias = async (req: Request, res: Response) => {
   try {
     const categorias = await CategoriaSchema.find({});
     const simpleCategoras = categorias.map((categoria) => {
-      const { _id, nome } = categoria;
-      return { id: _id, nome };
+      const { _id, nome, id } = categoria;
+      return { id, nome };
     });
 
     return res.status(201).json(simpleCategoras);
@@ -38,7 +41,7 @@ export const getCategoria = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const categoria = await CategoriaSchema.findById(id);
+    const categoria = await CategoriaSchema.find({ id: id });
 
     if (!categoria) {
       return res.status(404).json({ mensagem: "Categoria não encontrada" });
@@ -58,13 +61,13 @@ export const updateCategoria = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { nome } = req.body;
 
-    const categoria = await CategoriaSchema.findById(id);
+    const categoria = await CategoriaSchema.findOne({ id: id });
 
     if (!categoria) {
       return res.status(404).json({ mensagem: "Categoria não encontrada" });
     }
 
-    await categoria.updateOne({ nome });
+    await categoria.updateOne({ nome, id });
 
     return res.status(200).json({ nome });
   } catch (e: any) {
@@ -79,7 +82,7 @@ export const deleteCategoria = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const categoria = await CategoriaSchema.findById(id);
+    const categoria = await CategoriaSchema.findOne({ id: id });
 
     if (!categoria) {
       return res.status(404).json({ mensagem: "Categoria não encontrada" });

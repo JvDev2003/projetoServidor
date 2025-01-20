@@ -23,6 +23,11 @@ const CategoriasAlertas = () => {
         fetchData();
     }, []);
 
+    const handleClick = (id: string) => {
+        navigate(`/avisos/${id}`)
+    }
+
+
     return (
         <>
             <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
@@ -33,7 +38,11 @@ const CategoriasAlertas = () => {
                     <ul className="space-y-4">
                         {categorias && categorias.length === 0 && (<h4 className="text-center">Não existe nenhuma categoria categorias!</h4>)}
                         {categorias ? categorias.map(categoria => (
-                            <li key={categoria.id} className="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-50 transition flex justify-between items-center">
+                            <li
+                                key={categoria.id}
+                                className="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-50 transition flex justify-between items-center"
+                                onClick={() => handleClick(categoria.id)}
+                            >
                                 <div className="mt-2 space-x-2">
                                     <h3 className="text-xl">{categoria.nome}</h3>
                                 </div>
