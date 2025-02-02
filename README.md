@@ -14,7 +14,7 @@ A basic application using a API to receive and send data.
 
 This is a basic application that demonstrates the core features of APIs, such as routes, functionalities, middlewares, etc.
 
-Feel free to fork or clone this repository to start your own React project.
+Feel free to fork or clone this repository to start your own API project.
 
 ---
 
