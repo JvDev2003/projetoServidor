@@ -56,6 +56,12 @@ Before you begin, ensure that you have the following installed on your machine:
    JWT_SECRET={Secret of your JWT}
    ```
 
+   Run the backend
+
+   ```bash
+   npm run dev
+   ```
+
 3. Install packeges in frontend, fill the .env and run:
 
    ```bash
@@ -67,4 +73,10 @@ Before you begin, ensure that you have the following installed on your machine:
 
    ```bash
     VITE_URL={the url of your api}{Example: http://localhost:3000}
+   ```
+
+   Run the frontend
+
+   ```bash
+   npm run dev
    ```
