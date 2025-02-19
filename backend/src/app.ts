@@ -7,6 +7,7 @@ import db from "../config/db";
 import Logger from "../config/logger";
 import router from "./router";
 import morganMiddleware from "./middleware/morgan.middleware";
+import { getConectados } from "./controller/user.controller";
 
 const app = express();
 
@@ -23,4 +24,8 @@ const port = config.get<string>("port");
 app.listen(port, async () => {
   await db();
   Logger.info(`O servidor está na porta ${port}`);
+
+  setInterval(async () => {
+    console.log(await getConectados())
+  }, 5000);
 });

@@ -49,9 +49,6 @@ const useLogin = () => {
 
     try {
       const token = sessionStorage.getItem("token");
-      sessionStorage.removeItem("token");
-      setAdmin(false);
-      setIsAuthenticated(false);
       const response = await axios.post(
         `${apiUrl}/logout`,
         {},
@@ -68,6 +65,9 @@ const useLogin = () => {
       console.log(`Error: ${error.response?.data?.msg || error.message}`);
       throw error;
     } finally {
+      setAdmin(false);
+      setIsAuthenticated(false);
+      sessionStorage.removeItem("token");
       setLoading(false);
     }
   };

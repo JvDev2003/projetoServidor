@@ -4,6 +4,9 @@ import { comparePassword, hashPassword } from "../../config/hashFunctions";
 import config from "config";
 import Logger from "../../config/logger";
 import jwt from "jsonwebtoken";
+import { Conectado } from "../models/Conectados.model";
+import { Connection } from "mongoose";
+
 
 export async function createUser(req: Request, res: Response) {
   try {
@@ -12,7 +15,8 @@ export async function createUser(req: Request, res: Response) {
     const user = await UsuarioSchema.findOne({ email: email });
 
     if (user) {
-      return res.status(409).json({ mensagem: "Email já cadastrado" });
+      res.status(409).json({ mensagem: "Email já cadastrado" });
+      return
     }
 
     //const hash = await hashPassword(senha);
@@ -26,10 +30,10 @@ export async function createUser(req: Request, res: Response) {
 
     Logger.info("Usuario criado com sucesso");
 
-    return res.status(201).json({});
+    res.status(201).json({});
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
-    return res.status(400).json({ mensagem: "Dados invalidos" });
+    res.status(400).json({ mensagem: "Dados invalidos" });
   }
 }
 
@@ -47,10 +51,10 @@ export async function getUsers(req: Request, res: Response) {
       };
     });
 
-    return res.status(201).json(simpleUsers);
+    res.status(201).json(simpleUsers);
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
-    return res.status(500).json({ mensagem: "Tente Novamente mais tarde!" });
+    res.status(500).json({ mensagem: "Tente Novamente mais tarde!" });
   }
 }
 
@@ -61,28 +65,30 @@ export async function getUser(req: Request, res: Response) {
 
     if (!jwt.admin) {
       if (jwt.email !== email) {
-        return res.status(401).json({ mensagem: "Você não tem permissão!" });
+        res.status(401).json({ mensagem: "Você não tem permissão!" });
+        return
       }
     }
 
     const user = await UsuarioSchema.findOne({ email: email });
 
     if (!user) {
-      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+      res.status(404).json({ mensagem: "Usuário não encontrado" });
+      return
     }
 
     Logger.info("Usuario obtido com sucesso");
 
     //return res.status(201).json(user);
 
-    return res.status(201).json({
+    res.status(201).json({
       nome: user.nome,
       email: user.email,
       senha: "",
     });
   } catch (e: any) {
     Logger.error(`Ocorreu um erro: ${e.message}`);
-    return res.status(500).json({ mensagem: "Tente Novamente mais tarde!" });
+    res.status(500).json({ mensagem: "Tente Novamente mais tarde!" });
   }
 }
 
@@ -159,7 +165,8 @@ export async function login(req: Request, res: Response) {
     const user = await UsuarioSchema.findOne({ email: email });
 
     if (!user) {
-      return res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
+      res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
+      return
     }
 
     // if (!(await comparePassword(senha, user.senha))) {
@@ -167,7 +174,8 @@ export async function login(req: Request, res: Response) {
     // }
 
     if (senha !== user.senha) {
-      return res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
+      res.status(401).json({ mensagem: "Email e/ou senha invalidos" });
+      return
     }
     const jwtSecret = config.get<string>("jwtSecret");
 
@@ -180,12 +188,15 @@ export async function login(req: Request, res: Response) {
       { expiresIn: "15m" }
     );
 
+    await Conectado.create({ email });
+
     Logger.info("Usuario logado com sucesso");
 
-    return res.status(200).json({ token });
+    res.status(200).json({ token });
   } catch (e: any) {
     Logger.error(`Erro que ocorreu: ${e}`);
-    return res
+
+    res
       .status(401)
       .json({ mensagem: "Ocorreu um erro, tente mais tarde!" });
   }
@@ -193,8 +204,26 @@ export async function login(req: Request, res: Response) {
 
 export const logout = async (req: Request, res: Response) => {
   try {
-    return res.status(201).json({});
+
+    const { jwt } = req.body
+
+    const user = await UsuarioSchema.findOne({ email: jwt.email })
+
+    if (!user) {
+      res.status(401).json({});
+      return
+    }
+
+    await Conectado.deleteOne({ email: jwt.email })
+
+    res.status(201).json({});
   } catch (error) {
-    return res.status(401).json({});
+    res.status(401).json({});
   }
 };
+
+
+export const getConectados = async () => {
+
+  return await Conectado.find({}, { _id: 0, email: 1 })
+}

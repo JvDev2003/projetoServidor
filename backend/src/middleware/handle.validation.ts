@@ -13,7 +13,7 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
 
     errors.array().map((err) => extractedErrors.push({ [err.type]: err.msg }))
 
-    return res.status(422).json({
+    res.status(422).json({
         "errors": extractedErrors
     })
 }

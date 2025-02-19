@@ -97,4 +97,4 @@ export default router
 
   // login e logout
   .post("/login", loginValidation(), validate, login)
-  .post("/logout", validate, logout);
+  .post("/logout", sessionValidation(), validate, logout);
